@@ -165,9 +165,18 @@ Statement:
 
 - **Solvated MD trajectories** (~324 GB) are not archived. Water-stripped solute trajectories
   for the reference condition are available from the corresponding author on request.
-- A small number of **restart files and random seeds from the earliest runs** were not kept.
-  Those replicas cannot be reproduced bit-for-bit, though the ensemble statistics are unaffected.
-  `scripts/simulation/check_seeds.sh` reports which replicas retain seeds.
+- **Production restart files are absent for 280 of the 1,800 replicas**, produced before the
+  campaign was extended to 100 replicas per system. Random seeds were recovered from the
+  provenance records for 180 of those 280 and are listed in `data/seeds_assigned.csv`
+  (columns: condition, species, replica, and the three stage seeds for heating, equilibration
+  and production). For the remaining 100 they could not be recovered, so those replicas cannot
+  be reproduced bit-for-bit. The missing restart files would be needed only to extend those
+  particular runs further, which no reported result required; the ensemble statistics are
+  unaffected. `scripts/simulation/check_seeds.sh` regenerates this audit.
+
+- **Stereochemical screening.** `scripts/simulation/stereo_check.py` is the script used to screen
+  starting models for D-configured Calpha centres, non-proline cis peptide bonds and heavy-atom
+  contacts below 2.5 A.
 
 ---
 
