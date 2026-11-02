@@ -66,14 +66,45 @@ as −TΔS at 310.15 K.
 scripts/simulation/   system construction, MD, MM–PBSA, normal modes, cpptraj analyses
 scripts/analysis/     the scripts that produce every published figure and table
 data/                 derived tables the analysis scripts read
-topologies/           AMBER prmtop files for all 18 system × condition combinations
+topologies/           dry (solute-only) AMBER topologies used for MM–PBSA
+md_systems/           solvated topologies and equilibrated restarts, gzipped — rerun the MD
 inputs/               tleap, minimisation, equilibration, production, MM–PBSA and nmode inputs
 MANIFEST.sha256       checksums for every file in this deposit
 ```
 
 ---
 
-## 4. Provenance: every figure and table
+## 4. Two topology sets — use the right one
+
+| Directory | Contents | Use |
+|---|---|---|
+| `topologies/` | 3,937 atoms, **no solvent** | MM–PBSA and trajectory analysis, which operate on the stripped solute |
+| `md_systems/` | 59,818 atoms, ~13,930 waters plus ions | running or restarting the MD |
+
+`md_systems/` mirrors the `<condition>/<species>/` layout and holds, for each of the 18 system
+× condition combinations, the solvated topology and the equilibrated restart (`min2.rst`) at the
+end of the 50 ns NPT equilibration. Both are gzipped — 213 MB becomes 37 MB — so decompress
+before use:
+
+```bash
+gunzip -r md_systems/
+```
+
+To restart production for one system:
+
+```bash
+cd md_systems/opc-salt/lats1_complex
+pmemd.cuda -O -i ../../../inputs/opc-salt/lats1_complex/prod.in \
+           -p moblats.prmtop -c min2.rst -o prod.out -r prod.rst -x prod.nc
+```
+
+Each of the 100 replicas differs only in the random seed used for heating and thermal
+equilibration; `scripts/simulation/generate_replicas.sh` shows how they were generated, and
+`scripts/simulation/check_seeds.sh` reports which seeds were retained.
+
+---
+
+## 5. Provenance: every figure and table
 
 | Output | Script | Reads |
 |---|---|---|
@@ -94,7 +125,7 @@ MANIFEST.sha256       checksums for every file in this deposit
 
 ---
 
-## 5. Two conventions that matter when recomputing
+## 6. Two conventions that matter when recomputing
 
 **Pooled unbound MOB1A reference.** MOB1A is the same molecule in both complexes with
 parameter-identical topologies, so within each condition the two unbound MOB1A ensembles
@@ -114,7 +145,7 @@ MOB1A reference cancels before the standard error is taken.
 
 ---
 
-## 6. Archived separately
+## 7. Archived separately
 
 Too large for version control, deposited at the DOI given in the paper's Data Availability
 Statement:
@@ -124,9 +155,8 @@ Statement:
   this is the only condition for which normal modes were computed)
 - `cpptraj` analysis outputs: RDFs, hydrogen bonds, water shells, SASA, salt bridges,
   collective-variable time series (~1.3 GB)
-- Equilibrated restart coordinates (`.rst`) and solvated complex topologies
 
-## 7. Not retained
+## 8. Not retained
 
 - **Solvated MD trajectories** (~324 GB) are not archived. Water-stripped solute trajectories
   for the reference condition are available from the corresponding author on request.
@@ -136,7 +166,7 @@ Statement:
 
 ---
 
-## 8. Running these scripts elsewhere
+## 9. Running these scripts elsewhere
 
 The scripts are deposited **exactly as executed**, so they are a faithful record of what
 produced the published numbers rather than a polished package. 34 of the 49 scripts contain
@@ -172,6 +202,14 @@ only the path edits above.
 
 ---
 
-## 9. Contact
+## 10. Licence
+
+Code under `scripts/` is MIT-licensed. Data under `data/`, `topologies/`, `md_systems/` and
+`inputs/` is CC-BY-4.0. See `LICENSE`. If you use this material, cite the paper — `CITATION.cff`
+has the details and GitHub will format it for you.
+
+---
+
+## 11. Contact
 
 Ray Luo — rluo@uci.edu

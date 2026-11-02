@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use this deposit, please cite the publication below."
+title: "Data and analysis deposit: MM-PBSA of NDR2/LATS1-MOB1A complexes"
+authors:
+  - family-names: Lin
+    given-names: Tzuling
+  - family-names: Huang
+    given-names: Zhen
+  - family-names: Wang
+    given-names: Wenqi
+  - family-names: Luo
+    given-names: Ray
+    email: rluo@uci.edu
+license: MIT
+repository-code: "https://github.com/jocylynlin/ndr2-lats-mob1a-mmpbsa"
+preferred-citation:
+  type: article
+  title: "Lessons Learned from Modeling Highly Charged Protein-Protein Interactions with MM-PBSA: A Case Study of NDR2/LATS1-MOB1A Complexes"
+  authors:
+    - family-names: Lin
+      given-names: Tzuling
+    - family-names: Huang
+      given-names: Zhen
+    - family-names: Wang
+      given-names: Wenqi
+    - family-names: Luo
+      given-names: Ray
+  journal: "International Journal of Molecular Sciences"
+  year: 2026
