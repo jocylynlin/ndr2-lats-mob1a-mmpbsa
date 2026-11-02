@@ -1,0 +1,9 @@
+Initial minimization with steepest descent focus
+&cntrl
+  imin=1,        ! Perform minimization
+  maxcyc=30000,  ! Total steps of minimization
+  ncyc=24000,    ! Many steepest descent steps
+  ntb=1,         ! Constant volume periodic boundary
+  cut=10.0,      ! Nonbonded cutoff
+  ig=-1
+/

@@ -1,0 +1,4 @@
+Built and verified 2026-10-05 17:46:33 by logs/counterion_topologies.sh (job 1100591).
+Receptor/ligand cut from the stripped complex topology; parameters identical to the complex.
+Zinc retained (strip mask has no ZN), matching opc-salt and tip3p.
+Reused trajectories checked against their analysis topologies: 0 failures.

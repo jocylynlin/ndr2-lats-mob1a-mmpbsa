@@ -1,0 +1,12 @@
+condition,system,species,n,Covalent,Covalent_SEM,Electrostatic,Electrostatic_SEM,Dispersion,Dispersion_SEM,Hydrophobic,Hydrophobic_SEM,dH,dH_SEM
+counterion,LATS1,complex,100,5705.15,0.69,-973.58,0.13,-3132.82,0.43,2003.09,0.65,3601.83,1.05
+counterion,LATS1,MOB1A bound,100,4278.21,0.57,-718.99,0.11,-2333.72,0.34,1498.67,0.58,2724.17,0.92
+counterion,LATS1,kinase bound,100,1426.94,0.36,-236.86,0.07,-856.79,0.19,598.0,0.28,931.29,0.42
+counterion,LATS1,MOB1A free,100,4286.47,0.47,-719.68,0.12,-2335.38,0.39,1502.87,0.65,2734.28,0.86
+counterion,LATS1,kinase free,100,1425.87,0.24,-238.93,0.09,-855.1,0.34,596.82,0.6,928.65,0.48
+counterion,NDR2,complex,100,5694.22,0.69,-967.61,0.14,-3132.95,0.4,2002.14,0.57,3595.8,0.94
+counterion,NDR2,MOB1A bound,100,4276.97,0.47,-718.84,0.08,-2334.18,0.3,1499.7,0.59,2723.65,0.84
+counterion,NDR2,kinase bound,100,1417.25,0.47,-231.48,0.08,-855.42,0.21,598.91,0.26,929.26,0.56
+counterion,NDR2,MOB1A free,100,4284.07,0.4,-719.74,0.1,-2335.06,0.31,1498.4,0.56,2727.67,0.63
+counterion,NDR2,kinase free,100,1414.42,0.47,-233.3,0.08,-849.11,0.37,591.89,0.8,923.9,0.66
+counterion,shared,MOB1A free (pooled),200,4285.27,0.32,-719.71,0.08,-2335.22,0.25,1500.64,0.46,2730.98,0.58

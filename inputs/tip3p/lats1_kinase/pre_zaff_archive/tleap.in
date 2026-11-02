@@ -1,0 +1,31 @@
+### VERSION 1: TRUNCATED OCTAHEDRON ###
+# Load the main force fields
+source leaprc.protein.ff19SB
+source leaprc.water.tip3p
+
+source leaprc.phosaa19SB
+loadamberparams frcmod.ions1lm_126_tip3p
+
+# Load your structure
+mol = loadpdb lats.pdb
+
+check mol
+savepdb mol lats_ZAFF_dry.pdb
+
+# Solvate with truncated octahedron
+solvateoct mol TIP3PBOX 10.0
+
+
+# First neutralize
+addions mol Cl- 0
+addions mol Na+ 0
+
+# Then add NaCl pairs
+addions mol Na+ 80
+addions mol Cl- 80
+
+savepdb mol lats_ZAFF_solv_oct.pdb 
+saveamberparm mol lats.prmtop lats.inpcrd
+
+quit
+

@@ -1,0 +1,24 @@
+Production MD at 310.15K - Replica REPLICA_ID - 40ns
+&cntrl
+  imin=0,        ! No minimization
+  ntx=5,         ! Read coords and velocities
+  irest=1,       ! Restart
+  nstlim=20000000, ! 40 ns for production
+  dt=0.002,      ! Time step (ps)
+  ntf=2,         ! SHAKE on H bonds
+  ntc=2,         ! SHAKE on H
+  temp0=310.15,  ! Target temp
+  ntt=3,         ! Langevin thermostat
+  gamma_ln=1.0,  ! Collision frequency
+  ntpr=5000,     ! Print every 5000 steps
+  ntwx=5000,     ! Write coords every 5000 steps
+  ntwr=50000,    ! Write restarts every 50000 steps
+  cut=10.0,      ! Nonbonded cutoff
+  ntb=2,         ! Constant pressure
+  ntp=1,         ! Isotropic pressure scaling
+  pres0=1.0,     ! Target pressure (bar)
+  taup=2.0,      ! Pressure relaxation time
+  iwrap=1,       ! Wrap coords in output
+  ig=-1, ! Same random seed pattern as before
+  ntr=0,         ! No restraints
+/

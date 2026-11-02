@@ -1,0 +1,12 @@
+# Normal-mode entropy vs snapshots per replica, n=100 replicas per system, OPC reference condition.
+# Snapshots selected at EVEN SPACING across the 10 available (nmode startframe=400 endframe=4000 interval=400),
+# so every subset spans the full production window.
+# Values use the POOLED unbound MOB1A reference (both systems' ensembles combined), matching main-text Table 1.
+# -T*dS in kcal/mol, rescaled from the MMPBSA.py default 298.15 K to the simulation temperature 310.15 K.
+# Source: campaign_100x40ns/nmode/opc-salt/{lats1,ndr2}/traj_*/per_frame.csv
+snapshots,lats1_mTdS,lats1_se,ndr2_mTdS,ndr2_se,diff,diff_se
+2,65.51,1.08,64.95,1.06,0.57,1.35
+4,66.67,0.96,65.42,0.88,1.25,1.21
+6,67.20,0.87,64.01,0.82,3.19,1.08
+8,67.31,0.89,64.94,0.78,2.37,1.07
+10,67.27,0.83,64.63,0.81,2.64,1.05

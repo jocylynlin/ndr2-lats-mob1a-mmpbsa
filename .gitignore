@@ -1,0 +1,9 @@
+# AMBER run artefacts and bulk outputs are archived at the DOI, not in version control
+*.nc
+*.rst7
+*.mdcrd
+*.frc
+*.out.gz
+__pycache__/
+*.pyc
+.DS_Store

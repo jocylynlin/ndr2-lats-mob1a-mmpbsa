@@ -1,0 +1,4 @@
+Built and verified 2026-09-29 09:51:31 by logs/tip3p_topologies.sh (job 1097830).
+Receptor/ligand cut from the stripped complex topology; parameters identical to the complex.
+80 reused trajectories checked against their analysis topologies: 0 failures.
+Solute topologies byte-identical to opc-salt (atom names, types, charges, masses): water model is the only difference.

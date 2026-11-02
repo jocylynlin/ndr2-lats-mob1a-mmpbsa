@@ -1,0 +1,23 @@
+NPT equilibration at 310.15K - Replica REPLICA_ID
+&cntrl
+  imin=0,        ! No minimization
+  ntx=5,         ! Read coords and velocities
+  irest=1,       ! Restart
+  nstlim=25000000, ! 50 ns for eq
+  dt=0.002,      ! Time step (ps)
+  ntf=2,         ! SHAKE on H bonds
+  ntc=2,         ! SHAKE on H
+  temp0=310.15,  ! Target temp
+  ntt=3,         ! Langevin thermostat
+  gamma_ln=1.0,  ! Collision frequency
+  ntpr=1000,     ! Print every 1000 steps
+  ntwx=1000,     ! Write coords every 1000 steps
+  cut=10.0,      ! Nonbonded cutoff
+  ntb=2,         ! Constant pressure
+  ntp=1,         ! Isotropic pressure scaling
+  pres0=1.0,     ! Target pressure (bar)
+  taup=2.0,      ! Pressure relaxation time
+  iwrap=1,       ! Wrap coords in output
+  ig=-1, ! Same random seed as heating
+  ntr=0,         ! No restraints
+/
