@@ -82,8 +82,13 @@ MANIFEST.sha256       checksums for every file in this deposit
 | `md_systems/` | 59,818 atoms, ~13,930 waters plus ions | running or restarting the MD |
 
 `md_systems/` mirrors the `<condition>/<species>/` layout and holds, for each of the 18 system
-× condition combinations, the solvated topology and the equilibrated restart (`min2.rst`) at the
-end of the 50 ns NPT equilibration. Both are gzipped - 213 MB becomes 37 MB - so decompress
+× condition combinations, the solvated topology and the restart coordinates. **Restart from
+`min2.rst`** - it is the state at the end of the 50 ns NPT equilibration, which is where
+production began. The six kinase systems also carry `min1.rst`, the intermediate state between
+the steepest-descent and conjugate-gradient minimisation stages; it is included for
+completeness and is not the production starting point. The `build_zaff/` subdirectories under
+the kinase systems hold a byte-identical copy of the parent topology, retained because the
+build scripts reference that path. Both are gzipped - 213 MB becomes 37 MB - so decompress
 before use:
 
 ```bash
