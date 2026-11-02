@@ -246,8 +246,8 @@ only the path edits above.
 
 ## 11. Licence
 
-Code under `scripts/` is MIT-licensed. Data under `data/`, `topologies/`, `md_systems/` and
-`inputs/` is CC-BY-4.0. See `LICENSE`. If you use this material, cite the paper - `CITATION.cff`
+The entire deposit - code, inputs, topologies, restart coordinates and derived energy data -
+is released under the MIT License. See `LICENSE`. If you use this material, cite the paper - `CITATION.cff`
 has the details and GitHub will format it for you.
 
 ---
