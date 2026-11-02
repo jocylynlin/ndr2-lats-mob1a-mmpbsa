@@ -1,4 +1,4 @@
-# MM–PBSA of NDR2/LATS1–MOB1A complexes — data and analysis deposit
+# MM-PBSA of NDR2/LATS1-MOB1A complexes | data and analysis deposit
 
 Supporting data, inputs and analysis code for:
 
