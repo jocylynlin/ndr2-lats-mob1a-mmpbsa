@@ -6,6 +6,8 @@ Supporting data, inputs and analysis code for:
 > A Case Study of NDR2/LATS1-MOB1A Complexes.*
 > T. Lin, Z. Huang, W. Wang and R. Luo. Submitted to *Int. J. Mol. Sci.*
 
+Archived at **https://doi.org/10.5281/zenodo.23874118** (release v1.0.0).
+
 Everything reported in the paper and its Supporting Information can be recomputed from the
 material here plus the per-frame energies archived separately (see **Archived separately**).
 
