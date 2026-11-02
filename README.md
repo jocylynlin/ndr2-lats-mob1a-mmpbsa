@@ -2,8 +2,8 @@
 
 Supporting data, inputs and analysis code for:
 
-> *Lessons Learned from Modeling Highly Charged Protein–Protein Interactions with MM–PBSA:
-> A Case Study of NDR2/LATS1–MOB1A Complexes.*
+> *Lessons Learned from Modeling Highly Charged Protein-Protein Interactions with MM-PBSA:
+> A Case Study of NDR2/LATS1-MOB1A Complexes.*
 > T. Lin, Z. Huang, W. Wang and R. Luo. Submitted to *Int. J. Mol. Sci.*
 
 Everything reported in the paper and its Supporting Information can be recomputed from the
@@ -22,21 +22,21 @@ Three **conditions**, each with six **species**, each with **100 independent rep
 | Replicas | 100 per species per condition (1,800 trajectories) |
 | Protocol | 30,000 steps steepest descent + 30,000 conjugate gradient; 1 ns NVT heating/equilibration at 310.15 K; 50 ns NPT equilibration; **40 ns production**, coordinates every 10 ps (4,000 frames) |
 | Integrator | 2 fs timestep, 10 Å real-space cutoff, default PME |
-| Force field | AMBER ff19SB; OPC or TIP3P water; Li–Merz 12-6 monovalent ions; ZAFF bonded model for the MOB1A zinc site |
+| Force field | AMBER ff19SB; OPC or TIP3P water; Li-Merz 12-6 monovalent ions; ZAFF bonded model for the MOB1A zinc site |
 
 Two additional sets were run for the revision:
 
-- **Window test** — 20 replicas per system in the reference condition extended 40 → 100 ns,
-  with MM–PBSA recomputed over the 40–100 ns window (`extend_c1.sh`, `late_mmpbsa_parallel.sh`).
-- **Solvent-retaining set** — unbound kinases under each water model, 5 replicas × 40 ns with
+- **Window test** - 20 replicas per system in the reference condition extended 40 → 100 ns,
+  with MM-PBSA recomputed over the 40-100 ns window (`extend_c1.sh`, `late_mmpbsa_parallel.sh`).
+- **Solvent-retaining set** - unbound kinases under each water model, 5 replicas × 40 ns with
   solvent coordinates written every 100 ps, for hydration and ion analysis (`setup_c2.sh`,
   `c2_hydration_one.sh`).
 
 ### Construct definitions
 
-MOB1A UniProt Q9H8S9 residues 33–212; LATS1 residues 640–698 (from PDB **5BRK**); NDR2 residues
-25–83 (from PDB **5XQZ chain B**). Five NDR2 glutamates (Glu40, Glu43, Glu55, Glu61, Glu62) are
-modelled neutral so that both kinase segments carry net charge +6 — a deliberate control for the
+MOB1A UniProt Q9H8S9 residues 33-212; LATS1 residues 640-698 (from PDB **5BRK**); NDR2 residues
+25-83 (from PDB **5XQZ chain B**). Five NDR2 glutamates (Glu40, Glu43, Glu55, Glu61, Glu62) are
+modelled neutral so that both kinase segments carry net charge +6 - a deliberate control for the
 between-system comparison, discussed in Section 2.4 of the paper. All chain termini are uncapped
 and charged.
 
@@ -47,11 +47,11 @@ and charged.
 | | |
 |---|---|
 | MD | AMBER 2024, `pmemd.cuda` |
-| MM–PBSA / normal modes | AmberTools 2024, `MMPBSA.py` |
+| MM-PBSA / normal modes | AmberTools 2024, `MMPBSA.py` |
 | Trajectory analysis | `cpptraj` (AmberTools 2024) |
 | Analysis / figures | Python 3.13.2, numpy 2.2.5, scipy 1.15.3, pandas 2.3.1, matplotlib 3.10.0 |
 
-MM–PBSA settings: internal PBSA solver, `mbondi` radii, solute dielectric **20.0**, exterior
+MM-PBSA settings: internal PBSA solver, `mbondi` radii, solute dielectric **20.0**, exterior
 dielectric 80.0, ionic strength **0.150 M** (held fixed for all conditions, independent of the
 MD salt content), `inp=2` nonpolar model. Snapshots every 100 ps from the 40 ns production run
 (400 per replica). Normal modes: 10 equally spaced snapshots per replica, minimised to
@@ -63,27 +63,27 @@ as −TΔS at 310.15 K.
 ## 3. Layout
 
 ```
-scripts/simulation/   system construction, MD, MM–PBSA, normal modes, cpptraj analyses
+scripts/simulation/   system construction, MD, MM-PBSA, normal modes, cpptraj analyses
 scripts/analysis/     the scripts that produce every published figure and table
 data/                 derived tables the analysis scripts read
-topologies/           dry (solute-only) AMBER topologies used for MM–PBSA
-md_systems/           solvated topologies and equilibrated restarts, gzipped — rerun the MD
-inputs/               tleap, minimisation, equilibration, production, MM–PBSA and nmode inputs
+topologies/           dry (solute-only) AMBER topologies used for MM-PBSA
+md_systems/           solvated topologies and equilibrated restarts, gzipped - rerun the MD
+inputs/               tleap, minimisation, equilibration, production, MM-PBSA and nmode inputs
 MANIFEST.sha256       checksums for every file in this deposit
 ```
 
 ---
 
-## 4. Two topology sets — use the right one
+## 4. Two topology sets - use the right one
 
 | Directory | Contents | Use |
 |---|---|---|
-| `topologies/` | 3,937 atoms, **no solvent** | MM–PBSA and trajectory analysis, which operate on the stripped solute |
+| `topologies/` | 3,937 atoms, **no solvent** | MM-PBSA and trajectory analysis, which operate on the stripped solute |
 | `md_systems/` | 59,818 atoms, ~13,930 waters plus ions | running or restarting the MD |
 
 `md_systems/` mirrors the `<condition>/<species>/` layout and holds, for each of the 18 system
 × condition combinations, the solvated topology and the equilibrated restart (`min2.rst`) at the
-end of the 50 ns NPT equilibration. Both are gzipped — 213 MB becomes 37 MB — so decompress
+end of the 50 ns NPT equilibration. Both are gzipped - 213 MB becomes 37 MB - so decompress
 before use:
 
 ```bash
@@ -108,18 +108,18 @@ equilibration; `scripts/simulation/generate_replicas.sh` shows how they were gen
 
 | Output | Script | Reads |
 |---|---|---|
-| **Figure 1** covalent decomposition | `analysis/plot_covalent_decomp_n100.py` | per-replica MM–PBSA energies |
+| **Figure 1** covalent decomposition | `analysis/plot_covalent_decomp_n100.py` | per-replica MM-PBSA energies |
 | **Figures 2, 3** free-energy surfaces | `analysis/fes_physcv.py` | `physcv` CV time series, `data/cv_metrics.json` |
-| **Table 1** protocol comparison | `analysis/table1.py` | per-replica MM–PBSA energies |
-| **Tables 2, 3** water / ionic comparison | `analysis/table1.py`, `data/species_breakdown_n100.csv`, `data/species_breakdown_counterion.csv` | per-replica MM–PBSA energies |
-| **Figures S1, S2** time-series stability | `analysis/convplot.py` | per-frame MM–PBSA energies |
-| **Figure S3** replica distributions | `analysis/plot_figS3_replica_distributions.py` | per-replica MM–PBSA energies |
+| **Table 1** protocol comparison | `analysis/table1.py` | per-replica MM-PBSA energies |
+| **Tables 2, 3** water / ionic comparison | `analysis/table1.py`, `data/species_breakdown_n100.csv`, `data/species_breakdown_counterion.csv` | per-replica MM-PBSA energies |
+| **Figures S1, S2** time-series stability | `analysis/convplot.py` | per-frame MM-PBSA energies |
+| **Figure S3** replica distributions | `analysis/plot_figS3_replica_distributions.py` | per-replica MM-PBSA energies |
 | **Figure S4** bootstrap sign stability | `analysis/plot_covalent_bootstrap_n100.py` | per-replica covalent components |
 | **Figures S5, S6** RDFs | `analysis/plot_c2_rdf_si.py` | `cpptraj` RDFs from the solvent-retaining set |
 | **Tables S1, S2** covalent decomposition | `analysis/covdecomp.py` | per-replica covalent components |
 | **Table S3** normal-mode entropy | `analysis/ent_pool.py` | per-replica nmode energies |
 | **Table S4** snapshot sensitivity | `analysis/nmode_snapshot_convergence.py` | `data/nmode_snapshot_convergence_n100.csv` |
-| **Table S5** production-window test | `analysis/ddh_window.py` | 0–40 ns and 40–100 ns MM–PBSA on the same 20 replicas |
+| **Table S5** production-window test | `analysis/ddh_window.py` | 0-40 ns and 40-100 ns MM-PBSA on the same 20 replicas |
 | **Table S6** conformational metrics | `analysis/cv_metrics.py` | `physcv` CV time series → `data/cv_metrics.json` |
 | Drift test (reported in the repository, not the paper) | `analysis/drifttest.py` | `data/convergence_drift_tests.txt` |
 
@@ -132,8 +132,8 @@ parameter-identical topologies, so within each condition the two unbound MOB1A e
 (100 replicas each) are **pooled into one 200-replica reference** used for both systems.
 Pooling is never done across conditions. With a shared reference the term cancels exactly in the
 LATS1-minus-NDR2 contrast. Using each system's own MOB1A instead changes the multi-trajectory
-contrast substantially — the two sub-ensembles differ by 8.46 ± 1.28 kcal/mol under the reference
-condition — so results computed with a paired reference will not match the paper.
+contrast substantially - the two sub-ensembles differ by 8.46 ± 1.28 kcal/mol under the reference
+condition - so results computed with a paired reference will not match the paper.
 See `scripts/simulation/mt_pooled_reference.py`.
 
 **Replica-level uncertainties.** Every reported ± is a replica-level standard error:
@@ -150,7 +150,7 @@ MOB1A reference cancels before the standard error is taken.
 Too large for version control, deposited at the DOI given in the paper's Data Availability
 Statement:
 
-- Per-frame, per-replica MM–PBSA energies for every system and condition (~1.6 GB)
+- Per-frame, per-replica MM-PBSA energies for every system and condition (~1.6 GB)
 - Per-replica normal-mode energies for the multi-trajectory reference condition (~3.6 GB;
   this is the only condition for which normal modes were computed)
 - `cpptraj` analysis outputs: RDFs, hydrogen bonds, water shells, SASA, salt bridges,
@@ -193,7 +193,7 @@ campaign_100x40ns/
 ```
 
 where `<condition>` is `opc-salt`, `tip3p` or `counterion`, `<species>` is one of the six listed
-in Section 1, `<protocol>` is `st` or `mt`, and `<NNN>` is the zero-padded replica index 001–100.
+in Section 1, `<protocol>` is `st` or `mt`, and `<NNN>` is the zero-padded replica index 001-100.
 
 The SLURM submission scripts (`queue_*.sh`, `*_slurm.sh`, `rolling_submit*.sh`) encode the
 partitions and resource limits of the cluster used and will need rewriting for any other
@@ -205,11 +205,11 @@ only the path edits above.
 ## 10. Licence
 
 Code under `scripts/` is MIT-licensed. Data under `data/`, `topologies/`, `md_systems/` and
-`inputs/` is CC-BY-4.0. See `LICENSE`. If you use this material, cite the paper — `CITATION.cff`
+`inputs/` is CC-BY-4.0. See `LICENSE`. If you use this material, cite the paper - `CITATION.cff`
 has the details and GitHub will format it for you.
 
 ---
 
 ## 11. Contact
 
-Ray Luo — rluo@uci.edu
+Ray Luo - rluo@uci.edu
