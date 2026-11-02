@@ -65,7 +65,9 @@ as −TΔS at 310.15 K.
 ```
 scripts/simulation/   system construction, MD, MM-PBSA, normal modes, cpptraj analyses
 scripts/analysis/     the scripts that produce every published figure and table
-data/                 derived tables the analysis scripts read
+data/                 derived summary tables the analysis scripts read
+energies/             per-frame MM-PBSA and normal-mode energies, and the cpptraj
+                      hydration outputs - the primary numerical record, gzipped
 topologies/           dry (solute-only) AMBER topologies used for MM-PBSA
 md_systems/           solvated topologies and equilibrated restarts, gzipped - rerun the MD
 inputs/               tleap, minimisation, equilibration, production, MM-PBSA and nmode inputs
@@ -109,20 +111,45 @@ equilibration; `scripts/simulation/generate_replicas.sh` shows how they were gen
 
 ---
 
-## 5. Provenance: every figure and table
+## 5. The primary numerical record: `energies/`
+
+Every value in the paper derives from these files. All are gzipped; `gunzip -r energies/`
+decompresses in place.
+
+| Path | Contents |
+|---|---|
+| `energies/mmpbsa_perframe/*.csv.gz` | per-frame MM-PBSA energies, one table per condition and protocol |
+| `energies/nmode/<condition>/<system>/traj_<NNN>/per_frame.csv.gz` | normal-mode energies, 10 snapshots per replica, reference condition only |
+| `energies/hydration/<condition>/<species>/replica<NNN>/` | cpptraj outputs from the solvent-retaining set: RDFs, hydrogen bonds, water shells, SASA |
+
+The MM-PBSA tables are long-format, one row per frame, with columns
+`system, water_model, salt_condition, protocol, delta_method, replica, frame, traj_frame,
+time_ns, time_ns_abs` followed by the energy terms (`BOND, ANGLE, DIHED, VDWAALS, EEL, EPB,
+ENPOLAR, EDISPER` and the grouped contributions). File naming:
+
+- `_st` / `_mt` - single- or multi-trajectory protocol
+- `_pooledref` - uses the pooled 200-replica unbound MOB1A reference. **These are the tables
+  the paper's multi-trajectory numbers come from**; the plain `_mt` tables use each system's
+  own MOB1A and will not reproduce the published values (see Section 7)
+- `_late` - the 40-100 ns window from the 20 extended replicas, used for Table S5
+- `_rec` - receptor-only evaluation used to build the pooled reference
+
+---
+
+## 6. Provenance: every figure and table
 
 | Output | Script | Reads |
 |---|---|---|
-| **Figure 1** covalent decomposition | `analysis/plot_covalent_decomp_n100.py` | per-replica MM-PBSA energies |
+| **Figure 1** covalent decomposition | `analysis/plot_covalent_decomp_n100.py` | `energies/mmpbsa_perframe/` |
 | **Figures 2, 3** free-energy surfaces | `analysis/fes_physcv.py` | `physcv` CV time series, `data/cv_metrics.json` |
-| **Table 1** protocol comparison | `analysis/table1.py` | per-replica MM-PBSA energies |
-| **Tables 2, 3** water / ionic comparison | `analysis/table1.py`, `data/species_breakdown_n100.csv`, `data/species_breakdown_counterion.csv` | per-replica MM-PBSA energies |
-| **Figures S1, S2** time-series stability | `analysis/convplot.py` | per-frame MM-PBSA energies |
-| **Figure S3** replica distributions | `analysis/plot_figS3_replica_distributions.py` | per-replica MM-PBSA energies |
-| **Figure S4** bootstrap sign stability | `analysis/plot_covalent_bootstrap_n100.py` | per-replica covalent components |
-| **Figures S5, S6** RDFs | `analysis/plot_c2_rdf_si.py` | `cpptraj` RDFs from the solvent-retaining set |
-| **Tables S1, S2** covalent decomposition | `analysis/covdecomp.py` | per-replica covalent components |
-| **Table S3** normal-mode entropy | `analysis/ent_pool.py` | per-replica nmode energies |
+| **Table 1** protocol comparison | `analysis/table1.py` | `energies/mmpbsa_perframe/` |
+| **Tables 2, 3** water / ionic comparison | `analysis/table1.py`, `data/species_breakdown_n100.csv`, `data/species_breakdown_counterion.csv` | `energies/mmpbsa_perframe/` |
+| **Figures S1, S2** time-series stability | `analysis/convplot.py` | `energies/mmpbsa_perframe/` |
+| **Figure S3** replica distributions | `analysis/plot_figS3_replica_distributions.py` | `energies/mmpbsa_perframe/` |
+| **Figure S4** bootstrap sign stability | `analysis/plot_covalent_bootstrap_n100.py` | `energies/mmpbsa_perframe/` |
+| **Figures S5, S6** RDFs | `analysis/plot_c2_rdf_si.py` | `energies/hydration/*/rdf_*.dat` |
+| **Tables S1, S2** covalent decomposition | `analysis/covdecomp.py` | `energies/mmpbsa_perframe/` |
+| **Table S3** normal-mode entropy | `analysis/ent_pool.py` | `energies/nmode/` |
 | **Table S4** snapshot sensitivity | `analysis/nmode_snapshot_convergence.py` | `data/nmode_snapshot_convergence_n100.csv` |
 | **Table S5** production-window test | `analysis/ddh_window.py` | 0-40 ns and 40-100 ns MM-PBSA on the same 20 replicas |
 | **Table S6** conformational metrics | `analysis/cv_metrics.py` | `physcv` CV time series → `data/cv_metrics.json` |
@@ -130,7 +157,7 @@ equilibration; `scripts/simulation/generate_replicas.sh` shows how they were gen
 
 ---
 
-## 6. Two conventions that matter when recomputing
+## 7. Two conventions that matter when recomputing
 
 **Pooled unbound MOB1A reference.** MOB1A is the same molecule in both complexes with
 parameter-identical topologies, so within each condition the two unbound MOB1A ensembles
@@ -150,18 +177,17 @@ MOB1A reference cancels before the standard error is taken.
 
 ---
 
-## 7. Archived separately
+## 8. Archived separately
 
 Too large for version control, deposited at the DOI given in the paper's Data Availability
 Statement:
 
-- Per-frame, per-replica MM-PBSA energies for every system and condition (~1.6 GB)
-- Per-replica normal-mode energies for the multi-trajectory reference condition (~3.6 GB;
-  this is the only condition for which normal modes were computed)
-- `cpptraj` analysis outputs: RDFs, hydrogen bonds, water shells, SASA, salt bridges,
-  collective-variable time series (~1.3 GB)
+- AMBER intermediate files from the normal-mode runs (`_MMPBSA_*_nm.out.0`, ~3.5 GB) and the
+  force dumps written during MM-PBSA (`reference.frc`, ~1.3 GB). These are byproducts of the
+  calculations, not inputs to any reported result.
+- Exploratory `cpptraj` analyses not used in the paper (~700 MB)
 
-## 8. Not retained
+## 9. Not retained
 
 - **Solvated MD trajectories** (~324 GB) are not archived. Water-stripped solute trajectories
   for the reference condition are available from the corresponding author on request.
@@ -180,7 +206,7 @@ Statement:
 
 ---
 
-## 9. Running these scripts elsewhere
+## 10. Running these scripts elsewhere
 
 The scripts are deposited **exactly as executed**, so they are a faithful record of what
 produced the published numbers rather than a polished package. 34 of the 49 scripts contain
@@ -216,7 +242,7 @@ only the path edits above.
 
 ---
 
-## 10. Licence
+## 11. Licence
 
 Code under `scripts/` is MIT-licensed. Data under `data/`, `topologies/`, `md_systems/` and
 `inputs/` is CC-BY-4.0. See `LICENSE`. If you use this material, cite the paper - `CITATION.cff`
@@ -224,6 +250,6 @@ has the details and GitHub will format it for you.
 
 ---
 
-## 11. Contact
+## 12. Contact
 
 Ray Luo - rluo@uci.edu
