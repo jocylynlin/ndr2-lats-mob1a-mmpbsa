@@ -23,7 +23,7 @@ cond = sys.argv[1] if len(sys.argv) > 1 else "opc-salt"
 mode = sys.argv[2] if len(sys.argv) > 2 else "st"
 # modes ending in _late are the 40-100 ns window: MM-PBSA startframe=4001, not 1.
 STARTFRAME = 4001 if mode.endswith("_late") else 1
-META = {"opc-salt": ("OPC", "150 mM NaCl"), "tip3p": ("TIP3P", "150 mM NaCl"),
+META = {"opc-salt": ("OPC", "added NaCl"), "tip3p": ("TIP3P", "added NaCl"),
         "counterion": ("OPC", "counterion only")}
 water, salt = META[cond]
 SEC = {"Complex Energy Terms": "cpx", "Receptor Energy Terms": "rec",

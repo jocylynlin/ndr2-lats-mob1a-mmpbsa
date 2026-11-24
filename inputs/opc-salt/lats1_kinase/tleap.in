@@ -12,8 +12,8 @@ check mol
 solvateoct mol OPCBOX 10.0
 addions mol Cl- 0
 addions mol Na+ 0
-addions mol Na+ 80
-addions mol Cl- 80
+addions mol Na+ 52
+addions mol Cl- 52
 savepdb mol lats_solv.pdb
 saveamberparm mol lats.prmtop lats.inpcrd
 quit

@@ -28,8 +28,8 @@ addions mol Cl- 0
 addions mol Na+ 0
 
 # Then add NaCl pairs
-addions mol Na+ 80
-addions mol Cl- 80
+addions mol Na+ 42
+addions mol Cl- 42
 
 savepdb mol mobL_ZAFF_solv_oct.pdb 
 saveamberparm mol mobL.prmtop mobL.inpcrd
