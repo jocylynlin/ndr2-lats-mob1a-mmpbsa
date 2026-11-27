@@ -6,10 +6,21 @@ Supporting data, inputs and analysis code for:
 > A Case Study of NDR2/LATS1-MOB1A Complexes.*
 > T. Lin, Z. Huang, W. Wang and R. Luo. Submitted to *Int. J. Mol. Sci.*
 
-Release **v2.0.0**. The DOI of this version is given in the paper's Data Availability Statement.
+Release **v2.0.1**. The DOI of this version is given in the paper's Data Availability Statement.
 
-Every value reported in the paper and its Supporting Information can be recomputed from the
-files here. `scripts/analysis/reproduce_tables.py` does this for the main tables from the
+**Changes from v2.0.0 (analysis code and documentation only; every data file is unchanged).**
+- Normal-mode entropy: all converged snapshots of each species are now used. v2.0.0 shortened
+  the one replica with a non-converged ligand snapshot (`ndr2/traj_067`) to nine snapshots for
+  all three species. Affected scripts: `reproduce_tables.py`, `figures/tableS3_entropy.py`,
+  `figures/tableS4_nmode_snapshots.py`. The NDR2 entropy term moves from 62.35 to 62.37 and
+  the LATS1-minus-NDR2 free-energy difference from 4.51 to 4.49 kcal/mol.
+- PB ionic-strength sensitivity: `pb_sens_analyse.py` now scores the single-trajectory arm with
+  each complex's own bound MOB1A (-0.021 ± 0.010 kcal/mol; v2.0.0 printed -0.015 ± 0.011).
+- Stale expected values and print strings removed from three scripts; software versions and
+  two statements in this README corrected.
+
+Every simulation-derived value in the tables and figures of the paper and its Supporting
+Information can be recomputed from the files here. `scripts/analysis/reproduce_tables.py` does this for the main tables from the
 contents of `energies/` alone and compares each result with the printed value:
 
 ```bash
@@ -75,8 +86,8 @@ are uncapped and charged.
 | | |
 |---|---|
 | MD | AMBER 2024, `pmemd.cuda` |
-| MM-PBSA / normal modes | AmberTools 2024, `MMPBSA.py` |
-| Trajectory analysis | `cpptraj` (AmberTools 2024) |
+| MM-PBSA / normal modes | AmberTools 2025, `MMPBSA.py` |
+| Trajectory analysis | `cpptraj` V6.29.13 (AmberTools 2025) |
 | Analysis / figures | Python 3.13.2, numpy 2.2.5, scipy 1.15.3, pandas 2.3.1, matplotlib 3.10.0 |
 
 MM-PBSA settings: internal PBSA solver, `mbondi` radii, solute dielectric **20.0**, exterior
@@ -138,7 +149,7 @@ species, replica, and the heating, equilibration and production seeds; no header
 | `terminal_core/terminal_core_opc-salt.tar.gz` | `cpptraj` bonded energies of the whole kinase segment and of its 49-residue core, bound and unbound |
 | `interface/buried_area_<condition>.tar.gz`, `saltbridge_<condition>.tar.gz` | buried interface area and interfacial salt-bridge counts of the complexes, per frame |
 | `hydration/<condition>/<species>/replica<NNN>/` | `cpptraj` outputs of the solvent-retaining analysis: RDFs, hydrogen bonds, water shells, SASA |
-| `pb_sensitivity/pb_istrng_opc-salt.tar.gz` | raw `MMPBSA.py` per-frame output at PB ionic strengths 0.150 and 0.300 M |
+| `pb_sensitivity/pb_istrng_opc-salt.tar.gz` | raw `MMPBSA.py` per-frame output at PB ionic strengths 0.150 and 0.300 M, 10 replicas per system. The paper uses the `st/` arm only; the `mt/` arm was scored on the unbound runs that preceded the matched-salt correction and is historical |
 
 The MM-PBSA tables are long-format, one row per frame, with columns
 `system, water_model, salt_condition, protocol, delta_method, replica, frame, traj_frame,
@@ -194,8 +205,10 @@ match the paper.
 SE = s_replica / √N, where s_replica is the standard deviation of the N replica means. Per-system
 multi-trajectory standard errors include the pooled reference; standard errors of
 LATS1-minus-NDR2 differences exclude it. The complex, kinase-segment and MOB1A simulations are
-independent, so their standard errors are combined in quadrature; replicas are never paired by
-index.
+independent, so their standard errors are combined in quadrature; no standard error or bootstrap
+pairs replicas by index. The only place replicas are combined by replica number is the display of
+individual multi-trajectory points in SI Figure S3 and the distribution diagnostics computed from
+those points.
 
 ---
 

@@ -26,4 +26,3 @@ for s in ('lats1','ndr2'):
     rg,sa,cv=map(np.array,(rg,sa,cv))
     r1=np.corrcoef(rg,sa)[0,1]; r2=np.corrcoef(rg,cv)[0,1]
     print(f"{s}: n={len(rg)}  r(Rg, surface area) = {r1:+.2f}   r(Rg, covalent) = {r2:+.2f}  ({100*r2*r2:.0f}% of variance)")
-print("text currently: +0.83 / +0.82 and -0.14 / -0.15 (about 2%)")

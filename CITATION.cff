@@ -11,7 +11,7 @@ authors:
   - family-names: Luo
     given-names: Ray
     email: rluo@uci.edu
-version: "2.0.0"
+version: "2.0.1"
 license: MIT
 repository-code: "https://github.com/jocylynlin/ndr2-lats-mob1a-mmpbsa"
 preferred-citation:

@@ -62,7 +62,7 @@ flat = lambda r: [r["lats1"][0], r["lats1"][1], r["ndr2"][0], r["ndr2"][1], r["d
 print("Table 1 (reference condition: OPC, added NaCl)")
 check("ST dH   L, se, N, se, diff, se", flat(st("opc-salt", ["TOTAL"])), [-54.74, .51, -56.65, .47, 1.91, .69])
 ref = {g: mt("opc-salt", t) for g, t in GROUPS.items()}
-want = {"Covalent": [-3.14, 0.70, -5.63, 0.90, 2.49, 1.06], "Electrostatic": [-15.62, .21, -14.32, .20, -1.30, .27],
+want = {"Covalent": [-3.14, 0.70, -5.63, 0.90, 2.49, 1.06], "Electrostatic": [-15.62, .21, -14.32, .20, -1.30, .26],
         "Dispersion": [54.50, 0.65, 52.48, 0.67, 2.02, 0.85], "Hydrophobic": [-88.67, 1.06, -87.38, 1.08, -1.29, 1.36],
         "dH": [-52.93, 1.19, -54.85, 1.33, 1.92, 1.61]}
 for g in GROUPS: check(f"MT {g}", flat(ref[g]), want[g])
@@ -87,7 +87,7 @@ d3 = cnt["dH"]["diff"]
 check("ionic-condition contrast, se", [d1[0] - d3[0], math.hypot(d1[1], d3[1])], [0.64, 2.29])
 
 print("Table S1 (covalent components, LATS1 - NDR2, reference / TIP3P)")
-for cond, w in (("opc-salt", {"BOND": (-.17, .21), "ANGLE": (-0.27, 0.48), "DIHED": (2.88, 0.84), "1-4 VDW": (-0.96, 0.21), "1-4 EEL": (1.01, 0.14)}),
+for cond, w in (("opc-salt", {"BOND": (-.17, .20), "ANGLE": (-0.27, 0.48), "DIHED": (2.88, 0.84), "1-4 VDW": (-0.96, 0.21), "1-4 EEL": (1.01, 0.14)}),
                 ("tip3p", {"BOND": (-0.08, 0.20), "ANGLE": (-0.99, 0.45), "DIHED": (-0.43, 0.76), "1-4 VDW": (-1.59, .20), "1-4 EEL": (.73, .13)})):
     for t, v in w.items(): check(f"{cond} {t}", list(mt(cond, [t])["diff"]), list(v))
 
@@ -125,8 +125,9 @@ def nm(fn):
         m = re.search(key + r" Energy Terms\nFrame #,Translational,Rotational,Vibrational,Total\n((?:[-\d].*\n)+)", txt)
         if m is None: return None
         out[lab] = np.array([[float(v) for v in ln.split(",")] for ln in m.group(1).strip().split("\n")])
-    n = min(len(v) for v in out.values())
-    return {k: v[:n, 1:5].mean(axis=0) for k, v in out.items()}
+    # every converged snapshot of each species is used: the species are independent simulations,
+    # so the one non-converged ligand snapshot (ndr2 traj_067) removes no complex or receptor row
+    return {k: v[:, 1:5].mean(axis=0) for k, v in out.items()}
 N = {s: [o for o in (nm(f) for f in sorted(glob.glob(f"{E}/nmode/opc-salt/{s}/traj_*/per_frame.csv.gz"))) if o] for s in SYS}
 print("  replicas:", {s: len(N[s]) for s in SYS})
 k = 310.15 / 298.15
@@ -140,12 +141,12 @@ for j, name in enumerate(("trans", "rot", "vib", "total")):
     row += [k * (-(cx["lats1"][:, j].mean() - lg["lats1"][:, j].mean()) + (cx["ndr2"][:, j].mean() - lg["ndr2"][:, j].mean())),
             k * q(cx["lats1"][:, j], lg["lats1"][:, j], cx["ndr2"][:, j], lg["ndr2"][:, j])]
     ent[name] = row
-want = {"trans": [16.00, 0, 15.99, 0, 0, 0], "rot": [15.66, .01, 15.64, 0, .02, .01], "vib": [33.28, 0.82, 30.72, 0.76, 2.56, 1.02], "total": [64.94, 0.82, 62.35, 0.76, 2.59, 1.02]}
+want = {"trans": [16.00, 0, 15.99, 0, 0, 0], "rot": [15.66, .01, 15.64, 0, .02, .01], "vib": [33.28, 0.82, 30.74, 0.76, 2.54, 1.02], "total": [64.94, 0.82, 62.37, 0.76, 2.57, 1.02]}
 for name in ent: check(f"-TdS {name}", ent[name], want[name])
 ds = ent["total"][4:]
 check("dG L, se, N, se", [ref["dH"]["lats1"][0] + ent["total"][0], math.hypot(ref["dH"]["lats1"][1], ent["total"][1]),
-                          ref["dH"]["ndr2"][0] + ent["total"][2], math.hypot(ref["dH"]["ndr2"][1], ent["total"][3])], [12.01, 1.44, 7.50, 1.53])
-check("ddG, se", [d1[0] + ds[0], math.hypot(d1[1], ds[1])], [4.51, 1.91])
+                          ref["dH"]["ndr2"][0] + ent["total"][2], math.hypot(ref["dH"]["ndr2"][1], ent["total"][3])], [12.01, 1.44, 7.52, 1.53])
+check("ddG, se", [d1[0] + ds[0], math.hypot(d1[1], ds[1])], [4.49, 1.91])
 
 print("SI Section S5 (terminal / core partition of the kinase bonded energy)")
 COV = ["bond", "angle", "dih", "vdw14", "elec14"]

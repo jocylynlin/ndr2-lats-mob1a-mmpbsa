@@ -26,14 +26,16 @@ for s in S:
     for d in sorted(glob.glob(f'{ROOT}/{s}/traj_[0-9][0-9][0-9]')):
         o=parse(f'{d}/per_frame.csv')
         if o is None: continue
-        n=min(len(o['cpx']),len(o['rec']),len(o['lig']))
-        S[s].append({k:o[k][:n,4] for k in ('cpx','rec','lig')})     # col 4 = Total
+        S[s].append({k:o[k][:,4] for k in ('cpx','rec','lig')})      # col 4 = Total; all converged snapshots
 print(f"replicas: lats1 {len(S['lats1'])}, ndr2 {len(S['ndr2'])}")
 
 # single-snapshot and replica-mean spread, for the caption's SD sentence
 for s in S:
-    allsnap=np.concatenate([-SCALE*(r['cpx']-r['rec']-r['lig']) for r in S[s]])
-    repmean=np.array([(-SCALE*(r['cpx']-r['rec']-r['lig'])).mean() for r in S[s]])
+    # descriptive only: snapshots combined by index, over the indices all three species have
+    def comb(r):
+        n=min(len(r['cpx']),len(r['rec']),len(r['lig'])); return -SCALE*(r['cpx'][:n]-r['rec'][:n]-r['lig'][:n])
+    allsnap=np.concatenate([comb(r) for r in S[s]])
+    repmean=np.array([-SCALE*(r['cpx'].mean()-r['rec'].mean()-r['lig'].mean()) for r in S[s]])
     print(f"  {s}: SD of single-snapshot values {allsnap.std(ddof=1):.1f}, "
           f"SD of replica means {repmean.std(ddof=1):.1f} kcal/mol")
 
@@ -43,10 +45,9 @@ for k in (2,4,6,8,10):
     for s in S:
         v=[]; rv=[]; cv=[]; lv=[]
         for r in S[s]:
-            idx=np.unique(np.linspace(0,len(r['cpx'])-1,k).round().astype(int))
-            v.append(-(r['cpx'][idx]-r['lig'][idx]).mean())
-            cv.append(r['cpx'][idx].mean()); lv.append(r['lig'][idx].mean())
-            rv.append(r['rec'][idx].mean())
+            pick=lambda a: a[np.unique(np.linspace(0,len(a)-1,k).round().astype(int))]   # per species
+            cv.append(pick(r['cpx']).mean()); lv.append(pick(r['lig']).mean())
+            rv.append(pick(r['rec']).mean()); v.append(-(cv[-1]-lv[-1]))
         x[s]=np.array(v); rec[s]=np.array(rv); C[s]=np.array(cv); L[s]=np.array(lv)
     pool=np.concatenate([rec['lats1'],rec['ndr2']])
     cells=[]
@@ -56,6 +57,3 @@ for k in (2,4,6,8,10):
     dm=SCALE*(x['lats1'].mean()-x['ndr2'].mean()); de=SCALE*math.hypot(sem(C['lats1']),sem(L['lats1']),sem(C['ndr2']),sem(L['ndr2']))
     cells.append(f"\\saltvalue{{${dm:+.2f} \\pm {de:.2f}$}}")
     print(f"{k:<2d} & " + " & ".join(cells) + r" \\")
-print("\ncurrently printed: 2 65.51/64.95/+0.57 | 4 66.67/65.42/+1.25 | 6 67.20/64.01/+3.19 |"
-      " 8 67.31/64.94/+2.37 | 10 67.27/64.63/+2.64")
-print("Table S3 total row (must equal the k=10 row): 64.94+-0.78 / 62.35+-0.79 / +2.59+-1.01")

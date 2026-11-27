@@ -6,9 +6,18 @@ Complex, Receptor, Ligand, DELTA. (The campaign's deposited mmpbsa_perframe_*.cs
 a TIDIED form of this produced by mmpbsa_tidy.py, with cpx_/rec_/lig_ columns; the raw files
 here are not in that layout.)
 
-ddH is formed under the PAPER'S convention: the unbound MOB1A reference is POOLED over both
-systems, so the shared term cancels in the LATS1-minus-NDR2 difference. The raw MMPBSA output
-is index-matched; pooling is applied here.
+The two protocols are handled differently, because the receptor term differs between them.
+
+  ST  (the number quoted in the paper's Methods): MOB1A is taken from each complex's own
+      snapshots, so it is system-specific and does NOT cancel between LATS1 and NDR2. The
+      binding energy of a replica is MMPBSA.py's own DELTA block (complex - receptor - ligand).
+  MT  the unbound MOB1A reference is POOLED over both systems, so the shared term cancels in
+      the LATS1-minus-NDR2 difference. The MT arm deposited here was scored on the unbound
+      runs that preceded the matched-salt correction; it is historical, is not used in the
+      paper, and is kept only for completeness.
+
+(Release v2.0.0 of this script applied the pooled-reference cancellation to the ST arm as well,
+which gave -0.015 +- 0.011; the correct ST value, printed below, is -0.021 +- 0.010 kcal/mol.)
 
 The headline number is the PAIRED per-replica difference between istrng arms -- the same frames
 are scored in both, so frame-to-frame noise cancels. Absolute ddH at 10 snapshots/replica is
@@ -47,8 +56,13 @@ def load(arm):
         if not os.path.exists(f): continue
         b = blocks(f)
         if not all(k in b and b[k] for k in ('complex', 'receptor', 'ligand')): continue
-        D[(sysn, int(rep))] = {k: sum(b[k]) / len(b[k]) for k in ('complex', 'receptor', 'ligand')}
+        D[(sysn, int(rep))] = {k: sum(b[k]) / len(b[k]) for k in ('complex', 'receptor', 'ligand', 'delta') if b.get(k)}
     return D
+
+def ddh_own(D):
+    """ST: each complex's own bound MOB1A (the DELTA block)."""
+    per = {s: mse([v['delta'] for (ss, r), v in D.items() if ss == s]) for s in ('lats1', 'ndr2')}
+    return per['lats1'][0] - per['ndr2'][0], math.hypot(per['lats1'][1], per['ndr2'][1]), len(D)
 
 def ddh_pooled(D):
     ref = [v['receptor'] for v in D.values()]
@@ -70,21 +84,24 @@ for mode in ('st', 'mt'):
         print(f'{mode.upper()}: {len(arms)} arm(s) with data -- not ready\n'); continue
     lo, hi = sorted(arms)[0], sorted(arms)[-1]
     print('=' * 80)
-    label = ('receptor+ligand from the COMPLEX frames -- unaffected by the salt bug, final-quality'
+    ddh = ddh_own if mode == 'st' else ddh_pooled
+    label = ("receptor+ligand from the COMPLEX frames; each complex's own MOB1A (DELTA block)"
              if mode == 'st' else
-             'receptor+ligand from the OVER-SALTED unbound runs being replaced -- first look only')
-    print(f'{mode.upper()}  (pooled MOB1A reference)\n  {label}')
+             'pooled MOB1A reference; HISTORICAL: unbound runs from before the matched-salt correction, not used in the paper')
+    print(f'{mode.upper()}\n  {label}')
     print('=' * 80)
     for k in sorted(arms):
-        r = ddh_pooled(arms[k])
-        print(f'  istrng={k}   ddH = {r[0]:+7.2f} +- {r[1]:5.2f} kcal/mol'
-              f'   ({r[2]} replica-species, pooled over {r[2]} MOB1A replicas)')
+        r = ddh(arms[k])
+        print(f'  istrng={k}   ddH = {r[0]:+7.2f} +- {r[1]:5.2f} kcal/mol   ({r[2]} replicas)')
     common = sorted(set(arms[lo]) & set(arms[hi]))
     pair = {}
     for s in ('lats1', 'ndr2'):
-        pair[s] = mse([(arms[hi][k]['complex'] - arms[hi][k]['ligand'])
-                       - (arms[lo][k]['complex'] - arms[lo][k]['ligand'])
-                       for k in common if k[0] == s])
+        if mode == 'st':
+            pair[s] = mse([arms[hi][k]['delta'] - arms[lo][k]['delta'] for k in common if k[0] == s])
+        else:
+            pair[s] = mse([(arms[hi][k]['complex'] - arms[hi][k]['ligand'])
+                           - (arms[lo][k]['complex'] - arms[lo][k]['ligand'])
+                           for k in common if k[0] == s])
     dref = mse([arms[hi][k]['receptor'] - arms[lo][k]['receptor'] for k in common])
     d = pair['lats1'][0] - pair['ndr2'][0]; se = math.hypot(pair['lats1'][1], pair['ndr2'][1])
     print(f'\n  PAIRED {lo} -> {hi}  (same frames, so frame noise cancels)')
@@ -92,8 +109,9 @@ for mode in ('st', 'mt'):
           f'   [{abs(d)/se:.1f} sigma]' if se == se and se > 0 else '')
     print(f'    LATS1 shift = {pair["lats1"][0]:+.2f} +- {pair["lats1"][1]:.2f}')
     print(f'    NDR2  shift = {pair["ndr2"][0]:+.2f} +- {pair["ndr2"][1]:.2f}')
-    print(f'    shared MOB1A reference shift = {dref[0]:+.2f} +- {dref[1]:.2f}  (cancels in ddH)')
+    if mode == 'mt':
+        print(f'    shared MOB1A reference shift = {dref[0]:+.2f} +- {dref[1]:.2f}  (cancels in ddH)')
     for k in sorted(arms):
-        r = ddh_pooled(arms[k])
+        r = ddh(arms[k])
         print(f'    sign at istrng={k}: {"POSITIVE (experimental order)" if r[0] > 0 else "NEGATIVE"}')
     print()
